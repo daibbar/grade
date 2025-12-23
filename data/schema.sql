@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS responsable (
 CREATE TABLE IF NOT EXISTS clubs (
     id_club INTEGER PRIMARY KEY AUTOINCREMENT,
     nom TEXT NOT NULL UNIQUE,
-    category TEXT CHECK(category IN ('entertaiment', 'sport', 'technologique', 'entrepreneuriat social')) NOT NULL
+    category TEXT CHECK(category IN ('entertaiment', 'sport', 'technologique', 'entrepreneuriat social')) NOT NULL,
+    date_creation DATETIME NOT NULL,
+    club_description TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS events (
@@ -43,8 +45,8 @@ CREATE TABLE IF NOT EXISTS activities (
     capacite_max INTEGER CHECK(capacite_max > 0),
     date_debut TIMESTAMP NOT NULL,
     date_fin TIMESTAMP NOT NULL,
-    id_club INTEGER NOT NULL,
-    id_event INTEGER NOT NULL,
+    id_club INTEGER,
+    id_event INTEGER,
     FOREIGN KEY (id_club) REFERENCES clubs(id_club) ON DELETE CASCADE,
     FOREIGN KEY (id_event) REFERENCES events(id_event) ON DELETE CASCADE,
     CONSTRAINT check_only_one CHECK (
@@ -113,6 +115,25 @@ CREATE TABLE IF NOT EXISTS inscriptions (
     FOREIGN KEY (id_etudiant) REFERENCES etudiants(id_etudiant) ON DELETE CASCADE,
     FOREIGN KEY (id_activite) REFERENCES activities(id_activite) ON DELETE CASCADE,
     UNIQUE(id_etudiant, id_activite) -- Prevents double booking
+);
+
+CREATE TABLE IF NOT EXISTS guests (
+    id_guest INTEGER PRIMARY KEY AUTOINCREMENT,
+    guest_name TEXT NOT NULL,
+    guest_phone TEXT NOT NULL,
+    guest_email TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS guest_activity_role (
+    guest_role_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_guest INTEGER NOT NULL,
+    id_activite INTEGER NOT NULL,
+    role_description TEXT NOT NULL,
+    role_start_date TIMESTAMP NOT NULL,
+    role_end_date TIMESTAMP NOT NULL,
+    FOREIGN KEY (id_guest) REFERENCES guests(id_guest) ON DELETE CASCADE,
+    FOREIGN KEY (id_activite) REFERENCES activities(id_activite) ON DELETE CASCADE,
+    CHECK (role_end_date >= role_start_date)
 );
 
 INSERT INTO fillieres (nom) VALUES ('IID');
